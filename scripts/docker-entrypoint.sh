@@ -27,7 +27,7 @@ if [ "$LINT" -eq 1 ]; then
 fi
 
 echo "Starting test server"
-drush rs --quiet $SIMPLETEST_BASE_URL &
+drush rs --quiet "$SIMPLETEST_BASE_URL" &
 until curl -s "$SIMPLETEST_BASE_URL"; do true; done > /dev/null
 
 # test

@@ -68,5 +68,6 @@ drush rs --quiet 127.0.0.1:8282 &
 until curl -s http://127.0.0.1:8282/; do true; done > /dev/null
 
 echo "Running phpunit"
+cp "$PHPUNIT_FILE" web/core/phpunit.xml
 cd "$DRUPAL_DIR/web/core"
 "$DRUPAL_DIR"/vendor/bin/phpunit --debug

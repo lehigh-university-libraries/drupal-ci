@@ -19,6 +19,10 @@ jobs:
       with:
         dockerfile: Dockerfile
         verbose: true
+
+    - name: check valid sh
+      run: shellcheck **/*.sh
+
   build-push:
     needs: [lint]
     runs-on: ubuntu-latest

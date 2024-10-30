@@ -26,8 +26,11 @@ if [ "$LINT" -eq 1 ]; then
   fi
 fi
 
+echo "Starting test server"
+drush rs --quiet $SIMPLETEST_BASE_URL &
+until curl -s "$SIMPLETEST_BASE_URL"; do true; done > /dev/null
+
 # test
-PHPUNIT_FILE=web/core/phpunit.xml.dist
 if [ -v ENABLE_MODULES ]; then
   composer config --no-interaction allow-plugins true
   for MODULE in $ENABLE_MODULES; do
@@ -38,11 +41,7 @@ if [ -v ENABLE_MODULES ]; then
     fi
 
     DIR=$(dirname "$INFO_FILE")
-    if [ -f "$DIR/phpunit.xml" ]; then
-      PHPUNIT_FILE="$DIR/phpunit.xml"
-    fi
     COMPOSER_JSON="$DIR/composer.json"
-
     if [ -f "$COMPOSER_JSON" ]; then
       dependencies=$(jq -r '.require | to_entries[] | "\(.key):\(.value)"' "$COMPOSER_JSON")
       if [ -n "$dependencies" ]; then
@@ -59,15 +58,12 @@ if [ -v ENABLE_MODULES ]; then
     fi
   done
 
-  echo "Enabling $ENABLE_MODULES"
-  drush -y en "$ENABLE_MODULES"
+  echo "Running phpunit"
+  if [ -f "$DIR/phpunit.xml" ]; then
+    cp "$DIR/phpunit.xml" "$DRUPAL_DIR/web/core/"
+    cd "$DRUPAL_DIR/web/core"
+    "$DRUPAL_DIR"/vendor/bin/phpunit --debug
+  else
+    vendor/bin/phpunit -c web/core/phpunit.xml.dist --debug "$DIR"
+  fi
 fi
-
-echo "Starting test server"
-drush rs --quiet 127.0.0.1:8282 &
-until curl -s http://127.0.0.1:8282/; do true; done > /dev/null
-
-echo "Running phpunit"
-cp "$PHPUNIT_FILE" web/core/phpunit.xml
-cd "$DRUPAL_DIR/web/core"
-"$DRUPAL_DIR"/vendor/bin/phpunit --debug

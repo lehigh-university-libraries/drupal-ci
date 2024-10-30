@@ -1,0 +1,74 @@
+name: build-push
+on:
+  push:
+    branches:
+  schedule:
+    - cron: '15 12 * * *'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - uses: 'actions/checkout@v4'
+
+    - uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+        verbose: true
+  build-push:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ["8.1", "8.2", "8.3"]
+        drupal-version: ["10.2.x", "10.3.x", "10.4.x-dev", "11.0.x"]
+        exclude:
+          - drupal-version: "11.0.x"
+            php-versions: "8.1"
+          - drupal-version: "11.0.x"
+            php-versions: "8.2"
+    steps:
+    - uses: 'actions/checkout@v4'
+
+    - name: Extract branch or tag name as docker tag
+      shell: bash
+      run: |-
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          TAG=$(echo "${GITHUB_REF#refs/tags/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
+        else
+          TAG=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
+          if [ "$TAG" = "main" ]; then
+            TAG=""
+          fi
+        fi
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        DRUPAL_MAJOR_MINOR=$(echo "${{ matrix.drupal-version }}" | cut -d. -f1 -f2)
+        echo "drupal_version=$DRUPAL_MAJOR_MINOR" >> $GITHUB_OUTPUT
+      id: extract_tag
+
+    - name: Docker Hub Login
+      uses: docker/login-action@v3
+      with:
+        registry: 'docker.io'
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push dockerhub
+      uses: docker/build-push-action@v5
+      with:
+        platforms: |
+          linux/amd64
+          linux/arm64
+          linux/arm/v7
+          darwin/amd64
+          darwin/arm64
+        build-args: |
+          PHP_VERSION=${{ matrix.php-version }}
+          DRUPAL_VERSION=${{ matrix.drupal-version }}
+        push: true
+        tags: |
+          lehighlts/drupal-ci:${{ steps.extract_tag.outputs.drupal_version }}-php${{ matrix.php-version }}${{steps.extract_tag.outputs.tag}}

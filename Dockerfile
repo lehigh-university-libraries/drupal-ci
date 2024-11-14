@@ -22,7 +22,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 RUN apk update \
   && apk add --no-cache \
       bash==5.2.26-r0 \
-      curl==8.10.1-r0 \
+      curl==8.11.0-r2 \
       git==2.45.2-r0 \
       jq==1.7.1-r0 \
       yq==4.44.1-r2 \

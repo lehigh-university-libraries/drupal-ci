@@ -30,6 +30,7 @@ echo "Starting test server"
 drush rs --quiet "$SIMPLETEST_BASE_URL" &
 until curl -s "$SIMPLETEST_BASE_URL"; do true; done > /dev/null
 
+DIR=""
 # test
 if [ -v ENABLE_MODULES ]; then
   composer config --no-interaction allow-plugins true

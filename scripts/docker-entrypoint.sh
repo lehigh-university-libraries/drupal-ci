@@ -65,6 +65,6 @@ if [ -v ENABLE_MODULES ]; then
     cd "$DRUPAL_DIR/web/core"
     "$DRUPAL_DIR"/vendor/bin/phpunit --debug
   else
-    vendor/bin/phpunit -c web/core/phpunit.xml.dist --debug "$DIR"
+    vendor/bin/phpunit -c "$DRUPAL_DIR"/web/core/phpunit.xml.dist --debug "$DIR"
   fi
 fi

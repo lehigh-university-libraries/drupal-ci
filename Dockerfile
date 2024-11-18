@@ -32,6 +32,7 @@ RUN composer create-project drupal/recommended-project:$DRUPAL_VERSION . && \
   composer require "drupal/core-dev:$DRUPAL_VERSION" drush/drush && \
   ln -s /var/www/drupal/vendor/bin/drush /usr/local/bin/drush && \
   composer require drupal/coder && \
+  composer require --dev dmore/chrome-mink-driver behat/mink && \
   drush si --db-url=${SIMPLETEST_DB} --yes
 
 COPY scripts .

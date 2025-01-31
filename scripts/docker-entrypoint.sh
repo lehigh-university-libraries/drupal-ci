@@ -37,7 +37,7 @@ if [ -v ENABLE_MODULES ]; then
   for MODULE in $ENABLE_MODULES; do
     INFO_FILE=$(find web -type f -name "$MODULE.info.yml")
     if [ "$INFO_FILE" = "" ]; then
-      composer require "drupal/$MODULE" --no-interaction --yes
+      composer require "drupal/$MODULE" --no-interaction
       continue
     fi
 
@@ -55,7 +55,7 @@ if [ -v ENABLE_MODULES ]; then
         echo "No dependencies found for $MODULE"
       fi
     else
-      composer require "drupal/$MODULE" --no-interaction --yes
+      composer require "drupal/$MODULE" --no-interaction
     fi
   done
 

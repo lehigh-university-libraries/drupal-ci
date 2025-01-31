@@ -33,7 +33,9 @@ RUN composer create-project drupal/recommended-project:$DRUPAL_VERSION . && \
   ln -s /var/www/drupal/vendor/bin/drush /usr/local/bin/drush && \
   composer require drupal/coder && \
   composer require --dev dmore/chrome-mink-driver behat/mink && \
-  drush si --db-url=${SIMPLETEST_DB} --yes
+  drush si --db-url=${SIMPLETEST_DB} --yes && \
+  jq '."minimum-stability" = "dev"' composer.json > composer.json.tmp && \
+  mv composer.json.tmp composer.json
 
 COPY scripts .
 

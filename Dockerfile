@@ -12,13 +12,6 @@ ENV SIMPLETEST_BASE_URL=http://127.0.0.1:8282
 
 WORKDIR $DRUPAL_DIR
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
-RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions @composer \
-      gd \
-      zip
-
 RUN apk update \
   && apk add --no-cache \
       bash==5.2.26-r0 \
@@ -27,6 +20,11 @@ RUN apk update \
       jq==1.7.1-r0 \
       yq==4.44.1-r2 \
       zip==3.0-r12
+
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN install-php-extensions @composer \
+      gd \
+      zip
 
 RUN composer create-project drupal/recommended-project:$DRUPAL_VERSION . && \
   composer require "drupal/core-dev:$DRUPAL_VERSION" drush/drush && \

@@ -29,11 +29,15 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.1", "8.2", "8.3"]
-        drupal-version: ["10.2.x", "10.3.x", "10.4.x-dev", "11.0.x"]
+        drupal-version: ["10.2.x", "10.3.x", "10.4.x", "11.0.x", "11.1.x"]
         exclude:
           - drupal-version: "11.0.x"
             php-version: "8.1"
           - drupal-version: "11.0.x"
+            php-version: "8.2"
+          - drupal-version: "11.1.x"
+            php-version: "8.1"
+          - drupal-version: "11.1.x"
             php-version: "8.2"
     steps:
     - uses: 'actions/checkout@v4'
@@ -71,10 +75,8 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         platforms: |
-          linux/386
           linux/amd64
           linux/arm64/v8
-          linux/arm/v7
         build-args: |
           PHP_VERSION=${{ matrix.php-version }}
           DRUPAL_VERSION=${{ matrix.drupal-version }}

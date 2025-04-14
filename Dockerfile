@@ -21,7 +21,7 @@ ARG \
     GIT_VERSION=2.45.3-r0 \
     # renovate: datasource=repology depName=alpine_3_20/jq
     JQ_VERSION=1.7.1-r0 \
-    # renovate: datasource=repology depName=alpine_3_20/yq
+    # renovate: datasource=repology depName=alpine_3_20/yq-python
     YQ_VERSION=4.44.1-r2 \
     # renovate: datasource=repology depName=alpine_3_20/zip
     ZIP_VERSION=3.0-r12

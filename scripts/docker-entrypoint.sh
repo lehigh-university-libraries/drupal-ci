@@ -44,7 +44,7 @@ if [ -v ENABLE_MODULES ]; then
     DIR=$(dirname "$INFO_FILE")
     COMPOSER_JSON="$DIR/composer.json"
     if [ -f "$COMPOSER_JSON" ]; then
-      dependencies=$(jq -r '.require | to_entries[] | "\(.key):\(.value)"' "$COMPOSER_JSON")
+      dependencies=$(jq -r '.require | to_entries[] | "\(.key):\(.value)"' "$COMPOSER_JSON" || echo "")
       if [ -n "$dependencies" ]; then
         echo "Dependencies for $MODULE: $dependencies"
         for dependency in $dependencies; do

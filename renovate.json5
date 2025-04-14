@@ -1,0 +1,55 @@
+{
+  branchPrefix: 'renovate.',
+  extends: [
+    'config:best-practices',
+    ':rebaseStalePrs',
+  ],
+  packageRules: [
+    {
+      matchDatasources: [
+        'repology'
+      ],
+      versioning: 'loose',
+    },
+    {
+      groupName: 'apk-packages',
+      matchDatasources: [
+        'repology',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'digest',
+      ],
+      automerge: true,
+      automergeType: 'pr',
+    },
+    {
+      matchUpdateTypes: [
+        'major',
+      ],
+      enabled: false
+    }
+  ],
+  customManagers: [
+    {
+      customType: 'regex',
+      description: 'Update _VERSION variables in Dockerfiles',
+      fileMatch: [
+        '(^|/|\\.)Dockerfile$',
+      ],
+      matchStrings: [
+        '([ ]+)?# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: packageName=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG)? .+?_VERSION=(?<currentValue>.+?)(\\s|$)',
+      ],
+      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}loose{{/if}}',
+    }
+  ],
+  labels: [
+    'dependencies',
+  ],
+  osvVulnerabilityAlerts: true,
+  dependencyDashboardOSVVulnerabilitySummary: 'unresolved',
+  vulnerabilityAlerts: {
+    "enabled": true
+  }
+}

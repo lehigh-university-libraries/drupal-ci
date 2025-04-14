@@ -12,14 +12,28 @@ ENV SIMPLETEST_BASE_URL=http://127.0.0.1:8282
 
 WORKDIR $DRUPAL_DIR
 
+ARG \
+    # renovate: datasource=repology depName=alpine_3_20/bash
+    BASH_VERSION=5.2.26-r0 \
+    # renovate: datasource=repology depName=alpine_3_20/curl
+    CURL_VERSION=8.12.1-r0 \
+    # renovate: datasource=repology depName=alpine_3_20/git
+    GIT_VERSION=2.45.3-r0 \
+    # renovate: datasource=repology depName=alpine_3_20/jq
+    JQ_VERSION=1.7.1-r0 \
+    # renovate: datasource=repology depName=alpine_3_20/yq
+    YQ_VERSION=4.44.1-r2 \
+    # renovate: datasource=repology depName=alpine_3_20/zip
+    ZIP_VERSION=3.0-r12
+
 RUN apk update \
   && apk add --no-cache \
-      bash==5.2.26-r0 \
-      curl==8.12.1-r0 \
-      git==2.45.3-r0 \
-      jq==1.7.1-r0 \
-      yq==4.44.1-r2 \
-      zip==3.0-r12
+      bash=="${BASH_VERSION}" \
+      curl=="${CURL_VERSION}" \
+      git=="${GIT_VERSION}" \
+      jq=="${JQ_VERSION}" \
+      yq=="${YQ_VERSION}" \
+      zip=="${ZIP_VERSION}"
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN install-php-extensions @composer \

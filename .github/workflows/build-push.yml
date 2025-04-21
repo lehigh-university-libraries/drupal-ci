@@ -29,8 +29,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        php-version: ["8.1", "8.2", "8.3"]
-        drupal-version: ["10.2.x", "10.3.x", "10.4.x", "11.0.x", "11.1.x"]
+        php-version: ["8.1", "8.2", "8.3", "8.4"]
+        drupal-version: ["10.3.x", "10.4.x", "10.5.x", "11.0.x", "11.1.x"]
         exclude:
           - drupal-version: "11.0.x"
             php-version: "8.1"

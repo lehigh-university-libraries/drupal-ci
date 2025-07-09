@@ -18,7 +18,7 @@ ARG \
     # renovate: datasource=repology depName=alpine_3_20/curl
     CURL_VERSION=8.12.1-r0 \
     # renovate: datasource=repology depName=alpine_3_20/git
-    GIT_VERSION=2.45.3-r0 \
+    GIT_VERSION=2.45.4-r0 \
     # renovate: datasource=repology depName=alpine_3_20/jq
     JQ_VERSION=1.7.1-r0 \
     # renovate: datasource=repology depName=alpine_3_20/yq-python

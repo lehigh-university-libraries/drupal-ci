@@ -1,55 +1,7 @@
 {
-  branchPrefix: 'renovate.',
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    'config:best-practices',
-    ':rebaseStalePrs',
+    'github>lehigh-university-libraries/renovate-config',
+    'github>lehigh-university-libraries/renovate-config:weeklyBump.json5',
   ],
-  packageRules: [
-    {
-      matchDatasources: [
-        'repology',
-      ],
-      versioning: 'loose',
-    },
-    {
-      groupName: 'apk-packages',
-      matchDatasources: [
-        'repology',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-        'digest',
-      ],
-      automerge: true,
-      automergeType: 'pr',
-    },
-    {
-      matchUpdateTypes: [
-        'major',
-      ],
-      enabled: false,
-    },
-  ],
-  customManagers: [
-    {
-      customType: 'regex',
-      description: 'Update _VERSION variables in Dockerfiles',
-      managerFilePatterns: [
-        '/(^|/|\\.)Dockerfile$/',
-      ],
-      matchStrings: [
-        '([ ]+)?# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: packageName=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG)? .+?_VERSION=(?<currentValue>.+?)(\\s|$)',
-      ],
-      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}loose{{/if}}',
-    },
-  ],
-  labels: [
-    'dependencies',
-  ],
-  osvVulnerabilityAlerts: true,
-  dependencyDashboardOSVVulnerabilitySummary: 'unresolved',
-  vulnerabilityAlerts: {
-    enabled: true,
-  },
 }

@@ -7,7 +7,7 @@ e.g. to test the module in Drupal 11.0 in php 8.3 you can run
 ```
 MODULE=foo
 docker run --rm \
-  --volume $(pwd):/var/www/drupal/web/modules/contrib/$MODULE \
+  --volume $(pwd):/var/www/drupal/web/modules/contrib/$MODULE:ro \
   --env ENABLE_MODULES=$MODULE \
  lehighlts/drupal-ci:11.0-php8.3
 ```

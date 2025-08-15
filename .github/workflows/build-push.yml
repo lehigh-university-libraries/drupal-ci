@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.3", "8.4"]
-        drupal-version: ["11.1.x", "11.2.x"]
+        drupal-version: ["11.1.x", "11.2.x-dev"]
 
     steps:
     - uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # v5

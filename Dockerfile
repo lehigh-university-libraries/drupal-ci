@@ -16,7 +16,7 @@ ARG \
     # renovate: datasource=repology depName=alpine_3_20/bash
     BASH_VERSION=5.2.26-r0 \
     # renovate: datasource=repology depName=alpine_3_20/curl
-    CURL_VERSION=8.12.1-r0 \
+    CURL_VERSION=8.14.1-r2 \
     # renovate: datasource=repology depName=alpine_3_20/git
     GIT_VERSION=2.45.4-r0 \
     # renovate: datasource=repology depName=alpine_3_20/jq

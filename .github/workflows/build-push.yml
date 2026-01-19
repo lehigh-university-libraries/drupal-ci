@@ -24,56 +24,33 @@ jobs:
     - name: check valid sh
       run: shellcheck **/*.sh
 
-  build-push:
+  # get the apk cache set before building the other images
+  cache-seed:
     needs: [lint]
-    runs-on: ubuntu-24.04
     strategy:
       matrix:
         php-version: ["8.3", "8.4", "8.5"]
-        drupal-version: ["10.5.x", "10.6.x", "11.2.x", "11.3.x"]
+      fail-fast: false
+    uses: ./.github/workflows/build-image.yml
+    with:
+      php-version: ${{ matrix.php-version }}
+      drupal-version: "11.3.x"
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  build-push:
+    needs: [cache-seed]
+    strategy:
+      matrix:
+        php-version: ["8.3", "8.4", "8.5"]
+        drupal-version: ["10.5.x", "10.6.x", "11.2.x"]
       max-parallel: 3
       fail-fast: false
-    steps:
-    - uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # v6
-
-    - name: Extract branch or tag name as docker tag
-      shell: bash
-      run: |-
-        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-          TAG=$(echo "${GITHUB_REF#refs/tags/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
-        else
-          TAG=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
-          if [ "$TAG" = "main" ]; then
-            TAG=""
-          fi
-        fi
-        echo "tag=$TAG" >> $GITHUB_OUTPUT
-        DRUPAL_MAJOR_MINOR=$(echo "${{ matrix.drupal-version }}" | cut -d. -f1,2)
-        echo "drupal_version=$DRUPAL_MAJOR_MINOR" >> $GITHUB_OUTPUT
-      id: extract_tag
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-
-    - name: Docker Hub Login
-      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
-      with:
-        registry: 'docker.io'
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build and push dockerhub
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
-      with:
-        platforms: |
-          linux/amd64
-          linux/arm64/v8
-        build-args: |
-          PHP_VERSION=${{ matrix.php-version }}
-          DRUPAL_VERSION=${{ matrix.drupal-version }}
-        push: true
-        tags: |
-          lehighlts/drupal-ci:${{ steps.extract_tag.outputs.drupal_version }}-php${{ matrix.php-version }}${{steps.extract_tag.outputs.tag}}
+    uses: ./.github/workflows/build-image.yml
+    with:
+      php-version: ${{ matrix.php-version }}
+      drupal-version: ${{ matrix.drupal-version }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

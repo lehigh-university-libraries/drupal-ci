@@ -1,0 +1,72 @@
+name: build-image
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        required: true
+        type: string
+      drupal-version:
+        required: true
+        type: string
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # v6
+
+    - name: Extract branch or tag name as docker tag
+      shell: bash
+      run: |-
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          TAG=$(echo "${GITHUB_REF#refs/tags/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
+        else
+          TAG=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9._-]//g' | awk '{print substr($0, length($0)-120)}')
+          if [ "$TAG" = "main" ]; then
+            TAG=""
+          fi
+        fi
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        DRUPAL_MAJOR_MINOR=$(echo "${{ inputs.drupal-version }}" | cut -d. -f1,2)
+        echo "drupal_version=$DRUPAL_MAJOR_MINOR" >> $GITHUB_OUTPUT
+      id: extract_tag
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+    - name: Docker Hub Login
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+      with:
+        registry: 'docker.io'
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push dockerhub
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+      with:
+        platforms: |
+          linux/amd64
+          linux/arm64/v8
+        build-args: |
+          PHP_VERSION=${{ inputs.php-version }}
+          DRUPAL_VERSION=${{ inputs.drupal-version }}
+        push: true
+        tags: |
+          lehighlts/drupal-ci:${{ steps.extract_tag.outputs.drupal_version }}-php${{ inputs.php-version }}${{steps.extract_tag.outputs.tag}}
+        cache-from: |
+          type=gha,scope=drupal-${{ inputs.drupal-version }}-php${{ inputs.php-version }}
+          type=gha,scope=drupal-${{ inputs.drupal-version }}
+          type=gha,scope=php${{ inputs.php-version }}
+        cache-to: |
+          ${{ github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=drupal-{0}-php{1}', inputs.drupal-version, inputs.php-version) || '' }}
+          ${{ github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=drupal-{0}', inputs.drupal-version) || '' }}
+          ${{ github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=php{0}', inputs.php-version) || '' }}

@@ -2,6 +2,10 @@
 
 set -eou pipefail
 
+
+jq '."minimum-stability" = "dev"' composer.json > composer.json.tmp && \
+mv composer.json.tmp composer.json
+
 if [ "$LINT" -eq 1 ]; then
   cp web/core/phpcs.xml.dist .
   if [ -v ENABLE_MODULES ]; then

@@ -2,42 +2,36 @@
 
 set -eou pipefail
 
+if [ -z "${ENABLE_MODULES:-}" ]; then
+  echo "No modules set to enable in ENABLE_MODULES"
+  exit 1
+fi
+
 jq '."minimum-stability" = "dev"' composer.json > composer.json.tmp
 mv composer.json.tmp composer.json
 
 if [ "$LINT" -eq 1 ]; then
   cp web/core/phpcs.xml.dist .
-  if [ -v ENABLE_MODULES ]; then
-    for MODULE in $ENABLE_MODULES; do
-      INFO_FILE=$(find web -type f -name "$MODULE.info.yml")
-      if [ "$INFO_FILE" = "" ]; then
-        continue
-      fi
-      DIR=$(dirname "$INFO_FILE")
-
-      php vendor/bin/phpcs \
-          --standard=Drupal \
-          --extensions=php,module,inc,install,test,profile,theme \
-          "$DIR"
-      if [ "$DRUPAL_PRACTICE" -eq 1 ]; then
-        php vendor/bin/phpcs \
-          --standard=DrupalPractice \
-          --extensions=php,module,inc,install,test,profile,theme \
-          "$DIR"
-      fi
-    done
-  fi
-fi
-
-if [ -z "${ENABLE_MODULES:-}" ]; then
-  echo "No modules set to enable"
-  exit 0
+  for MODULE in $ENABLE_MODULES; do
+    INFO_FILE=$(find web -type f -name "$MODULE.info.yml")
+    if [ "$INFO_FILE" = "" ]; then
+      continue
+    fi
+    DIR=$(dirname "$INFO_FILE")
+    PHPCS_STANDARD=Drupal
+    if [ "$DRUPAL_PRACTICE" -eq 1 ]; then
+      PHPCS_STANDARD="Drupal,DrupalPractice"
+    fi
+    php vendor/bin/phpcs \
+        --standard="$PHPCS_STANDARD" \
+        --extensions=php,module,inc,install,test,profile,theme \
+        "$DIR"
+  done
 fi
 
 echo "Starting test server"
 drush rs --quiet "$SIMPLETEST_BASE_URL" &
 until curl -s "$SIMPLETEST_BASE_URL"; do sleep 1; done > /dev/null
-
 
 DIR=""
 composer config --no-interaction allow-plugins true
@@ -78,5 +72,8 @@ if [ -f "$DIR/phpunit.xml" ]; then
   "$DRUPAL_DIR"/vendor/bin/phpunit "${phpunit_args[@]}"
 # otherwise, use drupal core's default phpunit.xml
 else
-  vendor/bin/phpunit -c "$DRUPAL_DIR"/web/core/phpunit.xml.dist "${phpunit_args[@]}" "$DIR"
+  vendor/bin/phpunit \
+    -c "$DRUPAL_DIR"/web/core/phpunit.xml.dist \
+    "${phpunit_args[@]}" \
+    "$DIR"
 fi

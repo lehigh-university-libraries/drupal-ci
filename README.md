@@ -1,6 +1,6 @@
 # drupal-ci
 
-Drupal docker images to easily run linters and phpunit tests.
+Drupal docker images to easily run linters and phpunit tests for various combinations of Drupal and PHP.
 
 e.g. to test the module in Drupal 11.0 in php 8.3 you can run
 
@@ -16,8 +16,9 @@ docker run --rm \
 
 You can pass some environment variables to the docker image
 
-| Env Var Name       | Explanation                                                                                      |
-|------------------- |------------------------------------------------------------------------------------------------- |
-| `ENABLE_MODULES`  | The name of the module to enable (e.g. ENABLE_MODULES=turnstile_protect)                          |
-| `LINT`            | 1/0 - whether to run code sniffer with `Drupal` standard on the `ENABLE_MODULES` codebase         |
-| `DRUPAL_PRACTICE` | 1/0 - whether to run code sniffer with `DrupalPractice` standard on the `ENABLE_MODULES` codebase |
+| Env Var Name       | Default | Description                                                                                          |
+|------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `ENABLE_MODULES`   | ``      | The name of the module to enable (e.g. ENABLE_MODULES=islandora)                                     |
+| `LINT`             | `1`     | 1 or 0 - whether to run code sniffer with `Drupal` standard on the `ENABLE_MODULES` codebase         |
+| `DRUPAL_PRACTICE`  | `1`     | 1 or 0 - whether to run code sniffer with `DrupalPractice` standard on the `ENABLE_MODULES` codebase |
+| `TEST_SUITE`       | ``      | phpunit testsuite to run. Blank value runs all the tests.                                            |

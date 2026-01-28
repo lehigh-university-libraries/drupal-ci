@@ -12,16 +12,16 @@ mv composer.json.tmp composer.json
 
 if [ "$LINT" -eq 1 ]; then
   cp web/core/phpcs.xml.dist .
+  PHPCS_STANDARD=Drupal
+  if [ "$DRUPAL_PRACTICE" -eq 1 ]; then
+    PHPCS_STANDARD="Drupal,DrupalPractice"
+  fi
   for MODULE in $ENABLE_MODULES; do
     INFO_FILE=$(find web -type f -name "$MODULE.info.yml")
     if [ "$INFO_FILE" = "" ]; then
       continue
     fi
     DIR=$(dirname "$INFO_FILE")
-    PHPCS_STANDARD=Drupal
-    if [ "$DRUPAL_PRACTICE" -eq 1 ]; then
-      PHPCS_STANDARD="Drupal,DrupalPractice"
-    fi
     php vendor/bin/phpcs \
         --standard="$PHPCS_STANDARD" \
         --extensions=php,module,inc,install,test,profile,theme \

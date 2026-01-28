@@ -18,7 +18,7 @@ You can pass some environment variables to the docker image
 
 | Env Var Name       | Default | Description                                                                                          |
 |------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
-| `ENABLE_MODULES`   | ``      | The name of the module to enable (e.g. ENABLE_MODULES=islandora)                                     |
+| `ENABLE_MODULES`   |         | The name of the module to enable (e.g. ENABLE_MODULES=islandora)                                     |
 | `LINT`             | `1`     | 1 or 0 - whether to run code sniffer with `Drupal` standard on the `ENABLE_MODULES` codebase         |
 | `DRUPAL_PRACTICE`  | `1`     | 1 or 0 - whether to run code sniffer with `DrupalPractice` standard on the `ENABLE_MODULES` codebase |
-| `TEST_SUITE`       | ``      | phpunit testsuite to run. Blank value runs all the tests.                                            |
+| `TEST_SUITE`       |         | phpunit testsuite to run. Blank value runs all the tests.                                            |

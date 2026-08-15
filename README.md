@@ -1,5 +1,8 @@
 # drupal-ci
 
+> [!WARNING]
+> Moved to https://github.com/Islandora/islandora_ci
+
 Drupal docker images to easily run linters and phpunit tests for various combinations of Drupal and PHP.
 
 e.g. to test the module in Drupal 11.0 in php 8.3 you can run
